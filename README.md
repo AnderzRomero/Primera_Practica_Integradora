@@ -3,7 +3,7 @@ Este es un proyecto de ecommerce básico que se utiliza para el curso de Program
 
 ## Tecnologías utilizadas
 - Node.JS   ----->  `npm init` 
-- Paquetes a instalar de npm   ----->  `npm install express express-handlebars socket.io nodemon`
+- Paquetes a instalar de npm   ----->  `npm install express express-handlebars socket.io nodemon mongoose`
 
 ## Funcionalidades
 - Ver una lista de productos disponibles
