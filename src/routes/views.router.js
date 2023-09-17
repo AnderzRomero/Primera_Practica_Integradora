@@ -10,8 +10,12 @@ router.get("/", async (req, res) => {
 });
 
 router.get("/realTimeProducts", async (req, res) => {
-  const listaProductos = await pmanager.getProducts();
+  const listaProductos = await productsService.getProducts();
   res.render("realTimeProducts", { listaProductos });
+});
+
+router.get("/messages", (req, res) => {
+  res.render("messages");
 });
 
 export default router;

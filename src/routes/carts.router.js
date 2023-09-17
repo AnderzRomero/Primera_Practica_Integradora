@@ -1,11 +1,14 @@
 import { Router } from "express";
-import CartManager from "../dao/filesystem/managers/cartsManager.js";
-import { __dirname } from "../utils.js";
-const cartManager = new CartManager(__dirname + "/files/carts.json");
+import cartManager from "../dao/mongo/managers/cartsManager.js";
+import productsManager from "../dao/mongo/managers/productsManager.js";
+import __dirname from "../utils.js";
+
 const router = Router();
+const cartService = new cartManager();
+const productService = new productsManager();
 
 router.get("/", async (req, res) => {
-  const carts = await cartManager.getCarts();
+  const carts = await cartService.getCarts();
   if (carts.length === 0) {
     res.status(200).json({ message: "No hay carros creados" });
   } else {
@@ -14,20 +17,17 @@ router.get("/", async (req, res) => {
 });
 
 router.get("/:cid", async (req, res) => {
-  const cid = parseInt(req.params.cid);
-  const cart = await cartManager.getCartById(cid);
-
-  if (cart === "Not Found") {
-    res.status(400).json({ message: "Carrito no encontrado" });
-  } else if (cart) {
-    res.status(200).json(cart);
+  const { cid } = req.params;
+  const cart = await cartService.getCartById({ _id: cid });
+  if (!cart) {
+    res.status(400).json({ message: "Producto no encontrado" });
   } else {
-    res.status(400).json({ message: "Carrito no encontrado" });
+    res.send({ status: "success", payload: cart })
   }
 });
 
 router.post("/", async (req, res) => {
-  const cart = await cartManager.createCart();
+  const cart = await cartService.addCart();
   if (cart) {
     res.status(201).json({ message: "Carrito creado", cart });
   } else {
@@ -36,16 +36,38 @@ router.post("/", async (req, res) => {
 });
 
 router.post("/:cid/products/:pid", async (req, res) => {
+  const { cid, pid } = req.params;
+  const { quantity } = req.body;
+
   try {
-    const cid = parseInt(req.params.cid);
-    const pid = parseInt(req.params.pid);
-    await cartManager.addProductToCart(cid, pid);
-    res.status(200).json({ message: "Producto añadido al carrito con éxito" });
+    const checkIdProduct = await productManager.getProductById(pid);
+    if (!checkIdProduct) {
+      return res
+        .status(404)
+        .send({ message: `Product with ID: ${pid} not found` });
+    }
+
+    const checkIdCart = await cartManager.getCartById(cid);
+    if (!checkIdCart) {
+      return res
+        .status(404)
+        .send({ message: `Cart with ID: ${cid} not found` });
+    }
+
+    const result = await cartManager.addProductInCart(cid, {
+      _id: pid,
+      quantity: quantity,
+    });
+    console.log(result);
+    return res.status(200).send({
+      message: `Product with ID: ${pid} added to cart with ID: ${cid}`,
+      cart: result,
+    });
   } catch (error) {
-    console.error("Error al agregar el producto al carrito:", error);
-    res
+    console.error("Error occurred:", error);
+    return res
       .status(500)
-      .json({ status: "error", message: "No se pudo agregar el producto al carrito." });
+      .send({ message: "An error occurred while processing the request" });
   }
 });
 
