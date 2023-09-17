@@ -56,8 +56,10 @@
 }
 
 .btn-delete {
-  background-color: rgb(242, 73, 73);
+  background-color: rgb(12, 12, 12);
   color: white;
+  width: 20%;
+  margin: 10rem;
 }
 
 .container {

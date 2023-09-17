@@ -1,12 +1,11 @@
 import { Router } from "express";
-import ProductManager from "../managers/productsManager.js";
-import { __dirname } from "../utils.js";
+import ProductManager from "../dao/mongo/managers/productsManager.js";
 
-const pmanager = new ProductManager(__dirname + "/files/products.json");
 const router = Router();
+const productsService = new ProductManager();
 
 router.get("/", async (req, res) => {
-  const listaProductos = await pmanager.getProducts();
+  const listaProductos = await productsService.getProducts();
   res.render("home", { listaProductos });
 });
 

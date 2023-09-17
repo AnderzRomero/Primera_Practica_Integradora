@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 
-const collection = "Products";
+const collection = "products";
 
 const schema = new mongoose.Schema(
     {
@@ -13,8 +13,9 @@ const schema = new mongoose.Schema(
             required: true,
         },
         category: {
-            type: String,
-            required: true,
+            type: Array,
+            default: [],
+            required:true            
         },
         code: {
             type: String,
@@ -30,8 +31,8 @@ const schema = new mongoose.Schema(
             required: true,
         },
         thumbnail: {
-            type: String,
-            required: false,
+            type: Array,
+            default: []
         },
         status: {
             type: Boolean,
